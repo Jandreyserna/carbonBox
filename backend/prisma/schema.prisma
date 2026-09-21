@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Upload {
+  id            String   @id    @db.Uuid()
+  fileName      String
+  fileUrl       String
+  status        String
+  userId        String
+  totalRows     Int?
+  processedRows Int?
+  failedRows    Int?
+  errorMessage  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  activityData ActivityData[]
+
+  @@index([userId])
+}
+
+model ActivityData {
+  id        String   @id    @db.Uuid()
+  uploadId  String   @db.Uuid()
+  category  String
+  amount    Float
+  unit      String
+  date      DateTime
+  createdAt DateTime @default(now())
+
+  upload Upload @relation(fields: [uploadId], references: [id])
+
+  @@index([uploadId])
+}
