@@ -1,5 +1,5 @@
 export interface CreateUploadCommand {
     fileName: string;
-    fileUrl: string;
+    fileBuffer: Buffer;
     userId: string;
 }

@@ -5,11 +5,11 @@
   "description": "Sistema de procesamiento asincrono de documentos - Backend (Fastify + Prisma + DDD/CQRS)",
   "main": "dist/main/index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/main/index.ts",
-    "worker": "ts-node-dev --respawn --transpile-only src/workers/FileProcessingWorker.ts",
+    "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/main/index.ts",
+    "worker": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/workers/FileProcessingWorker.ts",
     "build": "tsc -p tsconfig.json",
-    "start": "node dist/main/index.js",
-    "start:worker": "node dist/workers/FileProcessingWorker.js",
+    "start": "cross-env TS_NODE_BASEURL=./dist node -r tsconfig-paths/register dist/main/index.js",
+    "start:worker": "cross-env TS_NODE_BASEURL=./dist node -r tsconfig-paths/register dist/workers/FileProcessingWorker.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "test": "jest"
@@ -28,16 +28,12 @@
     "@types/convict": "^6.1.6",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.14.9",
+    "cross-env": "^10.1.0",
     "jest": "^29.7.0",
     "prisma": "^5.16.0",
     "ts-jest": "^29.1.5",
     "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.5.3"
-  },
-  "_moduleAliases": {
-    "@domain": "src/document-processing/domain",
-    "@application": "src/document-processing/application",
-    "@infrastructure": "src/document-processing/infrastructure",
-    "@presentation": "src/document-processing/presentation"
   }
 }

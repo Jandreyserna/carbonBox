@@ -14,10 +14,10 @@ export class FileName extends ValueObject<FileNameProps> {
 
     static create(fileName: string): Either<Error, FileName> {
         if (!fileName || fileName.trim().length === 0) {
-            return Either.left(new Error('File name cannot be empty'));
+            return Either.left(new Error('El archivo no puede estar vacío'));
         }
         if(!fileName.toLowerCase().endsWith('.csv')) {
-            return Either.left(new Error('El Archivo debe tener la extensión .csv'));
+            return Either.left(new Error('El archivo debe tener la extensión .csv'));
         }
         return Either.right(new FileName({ value: fileName }));
     }

@@ -1,11 +1,22 @@
 import Fastify from 'fastify';
+import multipart from '@fastify/multipart';
 import { buildContainer } from './container';
 import { Routes } from './routes';
 
 const app = Fastify();
 const container = buildContainer();
 
+app.register(multipart, {
+    attachFieldsToBody: true,
+    limits: { fileSize: 20 * 1024 * 1024 },
+});
+
 app.decorate('container', container);
+
+app.setErrorHandler((error, _req, reply) => {
+    app.log.error(error);
+    reply.code(500).send({ error: 'Internal server error' });
+});
 
 new Routes(app).register();
 
