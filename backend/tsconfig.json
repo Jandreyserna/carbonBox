@@ -14,7 +14,14 @@
     "declaration": false,
     "sourceMap": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "paths": {
+      "@domain/*": ["./src/document-processing/domain/*"],
+      "@application/*": ["./src/document-processing/application/*"],
+      "@infrastructure/*": ["./src/document-processing/infrastructure/*"],
+      "@presentation/*": ["./src/document-processing/presentation/*"],
+      "@shared/*": ["./src/shared/*"]
+    }
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]

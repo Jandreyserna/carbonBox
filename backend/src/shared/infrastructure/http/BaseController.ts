@@ -2,7 +2,7 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import { IHttpRequest } from "./IHttpRequest";
 import { IHttpResponse } from "./IHttpResponse";
 
-export abstract class baseController {
+export abstract class BaseController {
     protected abstract handle(request: IHttpRequest): Promise<IHttpResponse>;
 
     async execute(req: FastifyRequest, res: FastifyReply): Promise<void> {
