@@ -1,5 +1,6 @@
 import Fastify from 'fastify';
 import multipart from '@fastify/multipart';
+import cors from '@fastify/cors';
 import { buildContainer } from './container';
 import { Routes } from './routes';
 
@@ -10,6 +11,8 @@ app.register(multipart, {
     attachFieldsToBody: true,
     limits: { fileSize: 20 * 1024 * 1024 },
 });
+
+app.register(cors, {origin: 'http://localhost:3001'});
 
 app.decorate('container', container);
 
