@@ -2,8 +2,8 @@ import { AwilixContainer, asClass } from "awilix";
 import { PrismaUploadRepository , PrismaActivityDataRepository} from "../persistence/repositories";
 import { S3FileStorage } from "../storage/S3FileStorage";
 import { CreateUploadCommandHandler, ProcessFileCommandHandler } from "@application/commands/handlers";
-import { GetUploadByIdQueryHandler, ListUploadQueryHandler, GetUploadResultsQueryHandler } from "@application/queries/handlers";
-import { CreateUploadController, GetUploadByIdController, GetUploadResultsController, ListUploadsController } from "@presentation/controllers";
+import { GetUploadByIdQueryHandler, ListUploadQueryHandler, GetUploadResultsQueryHandler, GetUploadsSummaryQueryHandler } from "@application/queries/handlers";
+import { CreateUploadController, GetUploadByIdController, GetUploadResultsController, GetUploadsSummaryController, ListUploadsController } from "@presentation/controllers";
 import { CsvParserService, FileProcessingService } from "@application/services";
 import { SqsMessagePublisher, SqsMessageConsumer } from "@infrastructure/messaging";
 
@@ -24,11 +24,13 @@ export function registerDocumentProcessingModule(container: AwilixContainer) {
         getUploadByIdQueryHandler: asClass(GetUploadByIdQueryHandler).singleton(),
         listUploadQueryHandler: asClass(ListUploadQueryHandler).singleton(),
         getUploadResultsQueryHandler: asClass(GetUploadResultsQueryHandler).singleton(),
-        
+        getUploadsSummaryQueryHandler: asClass(GetUploadsSummaryQueryHandler).singleton(),
+
         //controllers
         createUploadController: asClass(CreateUploadController).singleton(),
         getUploadByIdController: asClass(GetUploadByIdController).singleton(),
         listUploadsController: asClass(ListUploadsController).singleton(),
         getUploadResultsController: asClass(GetUploadResultsController).singleton(),
+        getUploadsSummaryController: asClass(GetUploadsSummaryController).singleton(),
     });
 }

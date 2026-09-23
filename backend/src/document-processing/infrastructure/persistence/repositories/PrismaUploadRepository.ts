@@ -1,5 +1,5 @@
 import { Upload } from "@domain/entities";
-import { IUploadRepository, ListUploadsResult, ListUploadsFilter } from "@domain/repositories/IUploadRepository";
+import { IUploadRepository, ListUploadsResult, ListUploadsFilter, UploadStatusCount } from "@domain/repositories/IUploadRepository";
 import { PrismaClient } from "@prisma/client";
 import { UploadMapper } from "../mappers/UploadMapper";
 
@@ -31,7 +31,27 @@ export class PrismaUploadRepository implements IUploadRepository {
         ]);
         return {
             data: data.map(UploadMapper.toDomain),
-            total, 
+            total,
         }
+    }
+
+    async countByStatus(userId: string): Promise<UploadStatusCount> {
+        const groups = await this.prisma.upload.groupBy({
+            by: ['status'],
+            where: { userId },
+            _count: { _all: true },
+        });
+
+        const counts: UploadStatusCount = { total: 0, pending: 0, processing: 0, completed: 0, failed: 0 };
+
+        for (const group of groups) {
+            const key = group.status.toLowerCase() as keyof Omit<UploadStatusCount, 'total'>;
+            if (key in counts) {
+                counts[key] = group._count._all;
+            }
+            counts.total += group._count._all;
+        }
+
+        return counts;
     }
 }
