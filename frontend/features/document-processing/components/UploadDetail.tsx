@@ -2,59 +2,104 @@
 
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { ArrowLeft, Rows3 } from 'lucide-react';
 import { useUpload } from '@/features/document-processing/api/hooks';
+import { isInProgress, uploadStatusMeta } from '@/features/document-processing/lib/upload-status';
+import type { Upload } from '@/features/document-processing/types/upload.types';
 import { getErrorMessage } from '@/shared/lib/api-client';
 import { formatDateTime } from '@/shared/lib/format-date';
-import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
-import { StatusBadge } from '@/shared/components/StatusBadge';
+import { ErrorAlert } from '@/shared/components/ErrorAlert';
+import { PageHeader } from '@/shared/components/PageHeader';
+import { StatCard } from '@/shared/components/StatCard';
+import { Button } from '@/shared/components/ui/button';
+import { Skeleton } from '@/shared/components/ui/skeleton';
 import { ProcessingStatus } from './ProcessingStatus';
 import { ResultsTable } from './ResultsTable';
+import { StatusBadge } from './StatusBadge';
+
+function BackToListButton() {
+  return (
+    <Button variant="outline" asChild>
+      <Link href="/uploads">
+        <ArrowLeft data-icon="inline-start" />
+        Volver a la lista
+      </Link>
+    </Button>
+  );
+}
+
+function UploadDetailSkeleton() {
+  return (
+    <div role="status" aria-label="Cargando" className="space-y-8">
+      <div className="space-y-2">
+        <Skeleton className="h-8 w-72 max-w-full" />
+        <Skeleton className="h-5 w-56 max-w-full" />
+      </div>
+      <Skeleton className="h-72 rounded-xl" />
+    </div>
+  );
+}
+
+function RowStats({ upload }: { upload: Upload }) {
+  const { COMPLETED, FAILED } = uploadStatusMeta;
+  const stats = [
+    { label: 'Filas totales', value: upload.totalRows ?? 0, icon: Rows3, toneClassName: 'bg-brand/10 text-brand' },
+    { label: 'Procesadas', value: upload.processedRows ?? 0, icon: COMPLETED.icon, toneClassName: COMPLETED.toneClassName },
+    { label: 'Fallidas', value: upload.failedRows ?? 0, icon: FAILED.icon, toneClassName: FAILED.toneClassName },
+  ];
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-3">
+      {stats.map((stat) => (
+        <StatCard key={stat.label} {...stat} />
+      ))}
+    </div>
+  );
+}
 
 export function UploadDetail() {
   const { id } = useParams<{ id: string }>();
   const { data: upload, isPending, isError, error } = useUpload(id);
 
-  if (isPending) return <LoadingSpinner />;
+  if (isPending) return <UploadDetailSkeleton />;
 
   if (isError) {
     return (
       <div className="space-y-4">
-        <p className="text-red-600">{getErrorMessage(error)}</p>
-        <Link href="/uploads" className="text-blue-600 underline">Volver a la lista</Link>
+        <ErrorAlert title="No pudimos cargar el upload" message={getErrorMessage(error)} />
+        <BackToListButton />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-xl font-semibold">{upload.fileName}</h1>
-        <p className="text-sm">Subido el {formatDateTime(upload.createdAt)}</p>
-        <StatusBadge status={upload.status} />
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        title={upload.fileName}
+        description={
+          <div className="flex flex-wrap items-center gap-2">
+            <StatusBadge status={upload.status} />
+            <span>Subido el {formatDateTime(upload.createdAt)}</span>
+          </div>
+        }
+        actions={<BackToListButton />}
+      />
 
-      {(upload.status === 'PENDING' || upload.status === 'PROCESSING') && (
-        <ProcessingStatus status={upload.status} />
-      )}
+      {isInProgress(upload.status) && <ProcessingStatus status={upload.status} />}
 
       {upload.status === 'FAILED' && (
-        <p role="alert" className="rounded bg-red-50 p-3 text-red-700">
-          El procesamiento falló: {upload.errorMessage ?? 'error desconocido'}
-        </p>
+        <ErrorAlert
+          title="El procesamiento falló"
+          message={upload.errorMessage ?? 'Error desconocido'}
+        />
       )}
 
       {upload.status === 'COMPLETED' && (
         <>
-          <p className="text-sm">
-            Filas totales: {upload.totalRows ?? 0} · Procesadas: {upload.processedRows ?? 0} · Fallidas: {upload.failedRows ?? 0}
-          </p>
+          <RowStats upload={upload} />
           <ResultsTable uploadId={upload.id} />
         </>
       )}
-
-      <Link href="/uploads" className="inline-block text-blue-600 underline">
-        Volver a la lista
-      </Link>
     </div>
   );
 }

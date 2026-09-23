@@ -1,5 +1,5 @@
 import { UploadForm } from '@/features/document-processing/components/UploadForm';
 
-export default function UploadsPage() {
+export default function NewUploadPage() {
   return <UploadForm />;
 }

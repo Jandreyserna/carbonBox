@@ -1,11 +1,71 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { FileSpreadsheet, X } from 'lucide-react';
+import { toast } from 'sonner';
 import { useCreateUpload } from '@/features/document-processing/api/hooks';
+import {
+  getCsvValidationError,
+  MAX_FILE_SIZE_MB,
+} from '@/features/document-processing/lib/csv-file-validation';
 import { getErrorMessage } from '@/shared/lib/api-client';
+import { formatFileSize } from '@/shared/lib/format-number';
+import { FileDropzone } from '@/shared/components/FileDropzone';
+import { PageHeader } from '@/shared/components/PageHeader';
+import { Button } from '@/shared/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/shared/components/ui/card';
+import { Progress } from '@/shared/components/ui/progress';
 
-const MAX_SIZE_MB = 20;
+interface SelectedFileProps {
+  file: File;
+  disabled: boolean;
+  onRemove: () => void;
+}
+
+function SelectedFile({ file, disabled, onRemove }: SelectedFileProps) {
+  return (
+    <div className="flex items-center gap-3 rounded-xl border bg-muted/30 p-3">
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
+        <FileSpreadsheet className="size-5" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium">{file.name}</p>
+        <p className="text-xs text-muted-foreground">{formatFileSize(file.size)}</p>
+      </div>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon-sm"
+        onClick={onRemove}
+        disabled={disabled}
+        aria-label="Quitar archivo"
+      >
+        <X />
+      </Button>
+    </div>
+  );
+}
+
+function UploadProgress({ progress }: { progress: number }) {
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-between text-sm">
+        <span className="text-muted-foreground">Subiendo…</span>
+        <span className="font-medium tabular-nums">{progress}%</span>
+      </div>
+      <Progress value={progress} aria-label="Progreso de subida" />
+    </div>
+  );
+}
 
 export function UploadForm() {
   const router = useRouter();
@@ -15,32 +75,13 @@ export function UploadForm() {
   const [progress, setProgress] = useState(0);
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const selected = event.target.files?.[0] ?? null;
+  const isUploading = createUpload.isPending;
+
+  function handleFileSelect(selected: File | null) {
+    const error = selected ? getCsvValidationError(selected) : null;
+    setValidationError(error);
+    setFile(error ? null : selected);
     setProgress(0);
-
-    if (!selected) {
-      setFile(null);
-      setValidationError(null);
-      return;
-    }
-
-    if (!selected.name.toLowerCase().endsWith('.csv')) {
-      setFile(null);
-      setValidationError('Solo se permiten archivos .csv');
-      event.target.value = '';
-      return;
-    }
-
-    if (selected.size > MAX_SIZE_MB * 1024 * 1024) {
-      setFile(null);
-      setValidationError(`El archivo no puede superar ${MAX_SIZE_MB} MB`);
-      event.target.value = '';
-      return;
-    }
-
-    setValidationError(null);
-    setFile(selected);
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -50,52 +91,65 @@ export function UploadForm() {
     setProgress(0);
     createUpload.mutate(
       { file, onProgress: setProgress },
-      { onSuccess: (data) => router.push(`/uploads/${data.id}`) },
+      {
+        onSuccess: ({ id }) => {
+          toast.success('Archivo subido', { description: 'Estamos procesando tus datos.' });
+          router.push(`/uploads/${id}`);
+        },
+        onError: (error) => {
+          toast.error('No se pudo subir el archivo', { description: getErrorMessage(error) });
+        },
+      },
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md space-y-4">
-      <h1 className="text-xl font-semibold">Subir archivo CSV</h1>
+    <div className="space-y-8">
+      <PageHeader
+        title="Subir archivo"
+        description="Carga un CSV con tus datos de actividad para procesarlo."
+      />
 
-      <div>
-        <label htmlFor="file" className="mb-1 block text-sm font-medium">
-          Archivo
-        </label>
-        <input
-          id="file"
-          type="file"
-          accept=".csv"
-          onChange={handleFileChange}
-          disabled={createUpload.isPending}
-        />
-      </div>
+      <form onSubmit={handleSubmit} className="max-w-2xl">
+        <Card>
+          <CardHeader>
+            <CardTitle>Archivo CSV</CardTitle>
+            <CardDescription>
+              Columnas esperadas: <code className="font-mono text-xs">category, amount, unit, date</code>
+            </CardDescription>
+          </CardHeader>
 
-      {validationError && <p className="text-sm text-red-600">{validationError}</p>}
+          <CardContent className="space-y-4">
+            {file ? (
+              <SelectedFile file={file} disabled={isUploading} onRemove={() => handleFileSelect(null)} />
+            ) : (
+              <FileDropzone
+                accept=".csv"
+                hint={`Solo archivos .csv de hasta ${MAX_FILE_SIZE_MB} MB`}
+                disabled={isUploading}
+                onFileSelect={handleFileSelect}
+              />
+            )}
 
-      {createUpload.isPending && (
-        <div className="space-y-1">
-          <div className="h-2 w-full rounded bg-gray-200">
-            <div
-              className="h-2 rounded bg-blue-600 transition-all"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          <p className="text-sm">Subiendo… {progress}%</p>
-        </div>
-      )}
+            {validationError && (
+              <p role="alert" className="text-sm text-destructive">
+                {validationError}
+              </p>
+            )}
 
-      {createUpload.isError && (
-        <p className="text-sm text-red-600">{getErrorMessage(createUpload.error)}</p>
-      )}
+            {isUploading && <UploadProgress progress={progress} />}
+          </CardContent>
 
-      <button
-        type="submit"
-        disabled={!file || createUpload.isPending}
-        className="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50"
-      >
-        {createUpload.isPending ? 'Subiendo…' : 'Subir'}
-      </button>
-    </form>
+          <CardFooter className="justify-end gap-2">
+            <Button variant="outline" asChild>
+              <Link href="/uploads">Cancelar</Link>
+            </Button>
+            <Button type="submit" disabled={!file || isUploading}>
+              {isUploading ? 'Subiendo…' : 'Subir archivo'}
+            </Button>
+          </CardFooter>
+        </Card>
+      </form>
+    </div>
   );
 }

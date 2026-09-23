@@ -1,37 +1,90 @@
 'use client';
 
+import { TableProperties } from 'lucide-react';
 import { useUploadResults } from '@/features/document-processing/api/hooks';
 import { getErrorMessage } from '@/shared/lib/api-client';
 import { formatDate } from '@/shared/lib/format-date';
-import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
+import { formatNumber } from '@/shared/lib/format-number';
+import { ErrorAlert } from '@/shared/components/ErrorAlert';
+import { TableSkeleton } from '@/shared/components/TableSkeleton';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/shared/components/ui/card';
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/shared/components/ui/empty';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/shared/components/ui/table';
 
-export function ResultsTable({ uploadId }: { uploadId: string }) {
+function NoResultsEmpty() {
+  return (
+    <Empty>
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <TableProperties />
+        </EmptyMedia>
+        <EmptyTitle>Sin filas válidas</EmptyTitle>
+        <EmptyDescription>El archivo se procesó, pero ninguna fila pasó la validación.</EmptyDescription>
+      </EmptyHeader>
+    </Empty>
+  );
+}
+
+function ResultsTableBody({ uploadId }: { uploadId: string }) {
   const { data, isPending, isError, error } = useUploadResults(uploadId, true);
 
-  if (isPending) return <LoadingSpinner />;
-  if (isError) return <p className="text-red-600">{getErrorMessage(error)}</p>;
-  if (data.data.length === 0) return <p>El archivo no tiene filas válidas.</p>;
+  if (isPending) return <TableSkeleton />;
+  if (isError) return <ErrorAlert message={getErrorMessage(error)} />;
+  if (data.data.length === 0) return <NoResultsEmpty />;
 
   return (
-    <table className="w-full text-left text-sm">
-      <thead className="border-b font-medium">
-        <tr>
-          <th className="py-2">Categoría</th>
-          <th>Cantidad</th>
-          <th>Unidad</th>
-          <th>Fecha</th>
-        </tr>
-      </thead>
-      <tbody>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Categoría</TableHead>
+          <TableHead className="text-right">Cantidad</TableHead>
+          <TableHead>Unidad</TableHead>
+          <TableHead>Fecha</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
         {data.data.map((row, index) => (
-          <tr key={index} className="border-b">
-            <td className="py-2">{row.category}</td>
-            <td>{row.amount}</td>
-            <td>{row.unit}</td>
-            <td>{formatDate(row.date)}</td>
-          </tr>
+          <TableRow key={index}>
+            <TableCell className="font-medium">{row.category}</TableCell>
+            <TableCell className="text-right tabular-nums">{formatNumber(row.amount)}</TableCell>
+            <TableCell className="text-muted-foreground">{row.unit}</TableCell>
+            <TableCell className="text-muted-foreground">{formatDate(row.date)}</TableCell>
+          </TableRow>
         ))}
-      </tbody>
-    </table>
+      </TableBody>
+    </Table>
+  );
+}
+
+export function ResultsTable({ uploadId }: { uploadId: string }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Resultados</CardTitle>
+        <CardDescription>Filas válidas extraídas del archivo</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ResultsTableBody uploadId={uploadId} />
+      </CardContent>
+    </Card>
   );
 }

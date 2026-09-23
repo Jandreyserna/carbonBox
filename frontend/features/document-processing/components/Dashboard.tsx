@@ -1,39 +1,68 @@
 'use client';
 
-import Link from 'next/link';
+import { Files } from 'lucide-react';
 import { useUploadsSummary } from '@/features/document-processing/api/hooks';
+import { uploadStatusMeta } from '@/features/document-processing/lib/upload-status';
+import type { UploadSummary } from '@/features/document-processing/types/upload.types';
 import { getErrorMessage } from '@/shared/lib/api-client';
-import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
+import { ErrorAlert } from '@/shared/components/ErrorAlert';
+import { PageHeader } from '@/shared/components/PageHeader';
+import { StatCard } from '@/shared/components/StatCard';
+import { Skeleton } from '@/shared/components/ui/skeleton';
+import { NewUploadButton } from './NewUploadButton';
+import { UploadsStatusChart } from './UploadsStatusChart';
 
-export function Dashboard() {
+function buildStats(summary: UploadSummary) {
+  const { COMPLETED, PROCESSING, FAILED } = uploadStatusMeta;
+
+  return [
+    { label: 'Total de uploads', value: summary.total, icon: Files, toneClassName: 'bg-brand/10 text-brand' },
+    { label: 'Completados', value: summary.completed, icon: COMPLETED.icon, toneClassName: COMPLETED.toneClassName },
+    { label: 'En proceso', value: summary.processing + summary.pending, icon: PROCESSING.icon, toneClassName: PROCESSING.toneClassName },
+    { label: 'Fallidos', value: summary.failed, icon: FAILED.icon, toneClassName: FAILED.toneClassName },
+  ];
+}
+
+function DashboardSkeleton() {
+  return (
+    <div role="status" aria-label="Cargando" className="space-y-6">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {Array.from({ length: 4 }, (_, index) => (
+          <Skeleton key={index} className="h-26 rounded-xl" />
+        ))}
+      </div>
+      <Skeleton className="h-80 rounded-xl" />
+    </div>
+  );
+}
+
+function DashboardBody() {
   const { data, isPending, isError, error } = useUploadsSummary();
 
-  if (isPending) return <LoadingSpinner />;
-  if (isError) return <p className="text-red-600">{getErrorMessage(error)}</p>;
-
-  const cards = [
-    { label: 'Total de uploads', value: data.total, color: 'text-gray-900' },
-    { label: 'Completados', value: data.completed, color: 'text-green-700' },
-    { label: 'En proceso', value: data.processing + data.pending, color: 'text-blue-700' },
-    { label: 'Fallidos', value: data.failed, color: 'text-red-700' },
-  ];
+  if (isPending) return <DashboardSkeleton />;
+  if (isError) return <ErrorAlert message={getErrorMessage(error)} />;
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Resumen</h1>
-
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        {cards.map((card) => (
-          <div key={card.label} className="rounded border p-4">
-            <p className="text-sm">{card.label}</p>
-            <p className={`text-3xl font-bold ${card.color}`}>{card.value}</p>
-          </div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {buildStats(data).map((stat) => (
+          <StatCard key={stat.label} {...stat} />
         ))}
       </div>
+      <UploadsStatusChart summary={data} />
+    </div>
+  );
+}
 
-      <Link href="/uploads/new" className="inline-block rounded bg-blue-600 px-4 py-2 text-white">
-        Crear nuevo upload
-      </Link>
+export function Dashboard() {
+  return (
+    <div className="space-y-8">
+      <PageHeader
+        title="Resumen"
+        description="Estado general del procesamiento de tus archivos."
+        actions={<NewUploadButton />}
+      />
+      <DashboardBody />
     </div>
   );
 }
