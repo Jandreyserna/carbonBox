@@ -3,7 +3,6 @@ import { IUploadRepository, ListUploadsResult, ListUploadsFilter } from "@domain
 import { PrismaClient } from "@prisma/client";
 import { UploadMapper } from "../mappers/UploadMapper";
 
-
 export class PrismaUploadRepository implements IUploadRepository {
     constructor(private readonly prisma: PrismaClient) {}
 

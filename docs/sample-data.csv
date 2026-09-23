@@ -1,0 +1,51 @@
+category,amount,unit,date
+Electricity,120.0,kWh,2024-01-01
+Natural Gas,91.7,m3,2024-01-02
+Transportation,313.4,km,2024-01-03
+Waste,35.1,kg,2024-01-04
+Water,116.8,m3,2024-01-05
+Electricity,248.5,kWh,2024-01-06
+Natural Gas,70.2,m3,2024-01-07
+Transportation,231.9,km,2024-01-08
+Waste,83.6,kg,2024-01-09
+Water,95.3,m3,2024-01-10
+Electricity,197.0,kWh,2024-01-11
+Natural Gas,138.7,m3,2024-01-12
+Transportation,170.4,km,2024-01-13
+Waste,67.1,kg,2024-01-14
+Water,173.8,m3,2024-01-15
+Electricity,120.5,kWh,2024-01-16
+Natural Gas,92.2,m3,2024-01-17
+Transportation,313.9,km,2024-01-18
+Waste,35.6,kg,2024-01-19
+Water,117.3,m3,2024-01-20
+Electricity,249.0,kWh,2024-01-21
+Natural Gas,70.7,m3,2024-01-22
+Transportation,232.4,km,2024-01-23
+Waste,84.1,kg,2024-01-24
+Water,95.8,m3,2024-01-25
+Electricity,197.5,kWh,2024-01-26
+Natural Gas,139.2,m3,2024-01-27
+Transportation,170.9,km,2024-01-28
+Waste,67.6,kg,2024-01-29
+Water,174.3,m3,2024-01-30
+Electricity,121.0,kWh,2024-01-31
+Natural Gas,92.7,m3,2024-02-01
+Transportation,314.4,km,2024-02-02
+Waste,36.1,kg,2024-02-03
+Water,117.8,m3,2024-02-04
+Electricity,249.5,kWh,2024-02-05
+Natural Gas,71.2,m3,2024-02-06
+Transportation,232.9,km,2024-02-07
+Waste,84.6,kg,2024-02-08
+Water,96.3,m3,2024-02-09
+Electricity,198.0,kWh,2024-02-10
+Natural Gas,139.7,m3,2024-02-11
+Transportation,171.4,km,2024-02-12
+Waste,68.1,kg,2024-02-13
+Water,174.8,m3,2024-02-14
+Electricity,121.5,kWh,2024-02-15
+Natural Gas,93.2,m3,2024-02-16
+Transportation,314.9,km,2024-02-17
+Waste,36.6,kg,2024-02-18
+Water,118.3,m3,2024-02-19
