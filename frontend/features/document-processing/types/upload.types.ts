@@ -2,8 +2,9 @@ export type UploadStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
 
 export interface Upload {
     id: string;
-    filename: string;
+    fileName: string;
     status: UploadStatus;
+    userId: string;
     totalRows?: number;
     processedRows?: number;
     failedRows?: number;
