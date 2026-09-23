@@ -2,6 +2,7 @@ import { createContainer, InjectionMode, asValue } from 'awilix';
 import { S3Client } from '@aws-sdk/client-s3';
 import { registerDocumentProcessingModule } from '@infrastructure/dependency-injection';
 import { PrismaClient } from '@prisma/client';
+import { SQSClient } from '@aws-sdk/client-sqs';
 
 export function buildContainer() {
     const container = createContainer({injectionMode: InjectionMode.CLASSIC});
@@ -16,11 +17,22 @@ export function buildContainer() {
         },
     });
 
+    const sqsClient = new SQSClient({
+        region: process.env.AWS_REGION,
+        endpoint: process.env.AWS_ENDPOINT,
+        credentials: {
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
+        },
+    });
+
     container.register({
         // infrastructure
         prisma: asValue( new PrismaClient() ),
         s3Client: asValue(s3Client),
         s3BucketName: asValue(process.env.S3_BUCKET_NAME as string),
+        sqsClient: asValue(sqsClient),
+        queueUrl: asValue(process.env.SQS_QUEUE_URL as string),
         s3PublicEndpoint: asValue(process.env.AWS_ENDPOINT as string),
     });
 

@@ -7,17 +7,22 @@ async function pollLoop() {
     const messageConsumer = container.resolve('messageConsumer');
     const processFileCommandHandler = container.resolve('processFileCommandHandler');
 
-    const messages = await messageConsumer.receive(1);
+    const message = await messageConsumer.receive();
 
-    for (const { receiptHandle, body } of messages) {
-        const result = await processFileCommandHandler.execute({ uploadId: body.uploadId });
-
-        if (result.isLeft()) {
-            console.error(`Error procesando upload ${body.uploadId}: ${result.value.message}`);
-            continue;
-        }
-        await messageConsumer.deleteMessage(receiptHandle);
+    if (!message) {
+        return;
     }
+
+    const { receiptHandle, body } = message;
+
+    const result = await processFileCommandHandler.execute({ uploadId: body.uploadId });
+
+    if (result.isLeft()) {
+        console.error(`Error procesando upload ${body.uploadId}: ${result.value.message}`);
+        return;
+    }
+
+    await messageConsumer.deleteMessage(receiptHandle);
 }
 
 setInterval(pollLoop, POLL_INTERVAL_MS);

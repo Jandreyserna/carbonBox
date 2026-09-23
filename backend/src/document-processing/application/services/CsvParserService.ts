@@ -1,6 +1,6 @@
 import { ActivityData } from "@domain/entities";
 import { Either, ValidationError } from "@shared/domain";
-import { parse } from "csv-parse/browser/esm/sync";
+import { parse } from "csv-parse/sync";
 
 
 export interface CsvParseResult {

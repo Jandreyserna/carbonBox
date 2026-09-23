@@ -8,7 +8,7 @@ type RouteModule = {
 
 export class Routes {
   private modules: RouteModule[] = [
-    { prefix: process.env.PATH_PREFIX + '/uploads', plugin: documentProcessingRoutes },
+    { prefix: process.env.PATH_PREFIX + '', plugin: documentProcessingRoutes },
   ];
 
   constructor(private readonly app: FastifyInstance) {}
