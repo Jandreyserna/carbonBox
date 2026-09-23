@@ -1,4 +1,4 @@
-import { Upload } from "@domain/entities/Upload";
+import { Upload } from "@domain/entities";
 import { IUploadRepository, ListUploadsResult, ListUploadsFilter } from "@domain/repositories/IUploadRepository";
 import { PrismaClient } from "@prisma/client";
 import { UploadMapper } from "../mappers/UploadMapper";

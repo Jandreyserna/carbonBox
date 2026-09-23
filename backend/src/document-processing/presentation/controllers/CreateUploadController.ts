@@ -1,12 +1,9 @@
 import { MultipartFile, MultipartValue } from '@fastify/multipart';
-import { CreateUploadCommand } from '@application/commands/objects/CreateUploadCommand';
-import { Upload } from '@domain/entities/Upload';
+import { CreateUploadCommand } from '@application/commands/objects';
+import { Upload } from '@domain/entities';
 import { ICommandHandler } from '@shared/application/ICommandHandler';
-import { AppError, ValidationError } from '@shared/domain/AppError';
-import { Either } from '@shared/domain/Either';
-import { BaseController } from '@shared/infrastructure/http/BaseController';
-import { IHttpRequest } from '@shared/infrastructure/http/IHttpRequest';
-import { IHttpResponse } from '@shared/infrastructure/http/IHttpResponse';
+import { Either, AppError, ValidationError } from '@shared/domain';
+import { BaseController, IHttpRequest, IHttpResponse } from '@shared/infrastructure/http';
 
 interface CreateUploadRequestBody {
     file: MultipartFile;

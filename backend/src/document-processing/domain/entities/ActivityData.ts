@@ -1,6 +1,5 @@
 import { randomUUID } from 'crypto';
-import { AggregateRoot } from '../../../shared/domain/AggregateRoot';
-import { Either } from '../../../shared/domain/Either';
+import { Either, AggregateRoot} from '@shared/domain';
 
 export interface ActivityDataProps {
   uploadId: string; category: string; amount: number; unit: string; date: Date; createdAt: Date;

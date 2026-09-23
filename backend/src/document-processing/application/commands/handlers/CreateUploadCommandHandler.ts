@@ -1,15 +1,16 @@
-import { Upload } from "@domain/entities/Upload";
-import { FileName } from "@domain/value-objects/FileNameProps";
-import { ICommandHandler } from "@shared/application/ICommandHandler";
-import { CreateUploadCommand } from "../objects/CreateUploadCommand";
-import { IUploadRepository } from "@domain/repositories/IUploadRepository";
-import { IFileStorage } from "@domain/repositories/IFileStorage";
-import { Either } from "@shared/domain/Either";
+import { Upload } from "@domain/entities";
+import { FileName } from "@domain/value-objects";
+import { ICommandHandler } from "@shared/application";
+import { CreateUploadCommand } from "../objects";
+import { IUploadRepository, IFileStorage } from "@domain/repositories";
+import { Either } from "@shared/domain";
+import { IMessagePublisher } from "@shared/infrastructure/messaging";
 
 export class CreateUploadCommandHandler implements ICommandHandler<CreateUploadCommand, Upload> {
     constructor(
         private readonly uploadRepository: IUploadRepository,
         private readonly fileStorage: IFileStorage,
+        private readonly messagePublisher: IMessagePublisher<{ uploadId: string }>,
     ) {}
 
     async execute(command: CreateUploadCommand): Promise<Either<Error, Upload>> {
@@ -31,6 +32,7 @@ export class CreateUploadCommandHandler implements ICommandHandler<CreateUploadC
         }
 
         await this.uploadRepository.save(uploadOrError.value);
+        await this.messagePublisher.publish({ uploadId: uploadOrError.value.id });
         return Either.right(uploadOrError.value);
     }
 }

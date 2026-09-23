@@ -1,8 +1,6 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { Either } from "@shared/domain/Either";
-import { AppError } from "@shared/domain/AppError";
-import { IHttpRequest } from "./IHttpRequest";
-import { IHttpResponse } from "./IHttpResponse";
+import { Either, AppError } from "@shared/domain";
+import { IHttpRequest, IHttpResponse  } from "./";
 
 export abstract class BaseController {
     protected abstract handle(request: IHttpRequest): Promise<Either<AppError, IHttpResponse>>;

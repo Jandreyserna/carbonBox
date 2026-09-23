@@ -1,7 +1,6 @@
 import { randomUUID } from 'crypto';
-import { AggregateRoot } from '../../../shared/domain/AggregateRoot';
-import { Either } from '../../../shared/domain/Either';
-import { FileName } from '../value-objects/FileNameProps';
+import { Either, AggregateRoot } from '../../../shared/domain';
+import { FileName } from '../value-objects';
 import { UploadStatus, UploadStatusEnum } from '../value-objects/UploadStatus';
 
 export interface UploadProps {

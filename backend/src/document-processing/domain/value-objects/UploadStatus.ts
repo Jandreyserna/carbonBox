@@ -1,5 +1,4 @@
-import { Either } from "../../../shared/domain/Either";
-import { ValueObject } from "../../../shared/domain/ValueObject";
+import { Either, ValueObject } from "@shared/domain";
 
 export enum UploadStatusEnum {
     PENDING = 'PENDING',

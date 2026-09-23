@@ -1,7 +1,6 @@
 import { Upload as UploadModel } from "@prisma/client";
-import { Upload } from "@domain/entities/Upload";
-import { FileName } from "@domain/value-objects/FileNameProps";
-import { UploadStatus } from "@domain/value-objects/UploadStatus";
+import { Upload } from "@domain/entities";
+import { FileName, UploadStatus } from "@domain/value-objects";
 
 export class UploadMapper {
     public static toDomain(model: UploadModel): Upload {

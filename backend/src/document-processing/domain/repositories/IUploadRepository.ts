@@ -1,4 +1,4 @@
-import { Upload } from '../entities/Upload';
+import { Upload } from '../entities';
 
 export interface ListUploadsFilter { userId: string; page: number; limit: number; }
 export interface ListUploadsResult { data: Upload[]; total: number; }
