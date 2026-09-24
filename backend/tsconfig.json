@@ -15,12 +15,13 @@
     "sourceMap": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "baseUrl": "./src",
     "paths": {
-      "@domain/*": ["./src/document-processing/domain/*"],
-      "@application/*": ["./src/document-processing/application/*"],
-      "@infrastructure/*": ["./src/document-processing/infrastructure/*"],
-      "@presentation/*": ["./src/document-processing/presentation/*"],
-      "@shared/*": ["./src/shared/*"]
+      "@domain/*": ["document-processing/domain/*"],
+      "@application/*": ["document-processing/application/*"],
+      "@infrastructure/*": ["document-processing/infrastructure/*"],
+      "@presentation/*": ["document-processing/presentation/*"],
+      "@shared/*": ["shared/*"]
     }
   },
   "include": ["src/**/*.ts"],
